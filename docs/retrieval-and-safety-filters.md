@@ -80,3 +80,7 @@ Options for systems where silently skipping isn't acceptable:
 This is a single observation on a single corpus with a single provider, not a controlled study. The mechanism is straightforward enough that it should generalise, but the thresholds involved are provider-specific and undocumented, and the corpus here is unusual — private multilingual messaging rather than the documents most RAG systems index.
 
 Taken as: a thing worth knowing about, not a measured result.
+
+## Proof
+<img width="816" height="796" alt="Proof" src="https://github.com/user-attachments/assets/e286b82a-db07-486a-84b4-445eb421468e" />
+
