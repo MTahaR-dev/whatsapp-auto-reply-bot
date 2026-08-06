@@ -20,6 +20,7 @@ from google import genai
 from google.genai import types
 
 import memory
+import retriever
 
 # ---------------------------------------------------------------- CONFIG
 
@@ -43,6 +44,12 @@ CHATS_FILE = os.path.join(HERE, "data", "chats.json")
 EXAMPLES_PER_CONTACT = 25
 THIN_HISTORY = 15               # below this, top up with examples from other chats
 GENERAL_EXAMPLES = 20
+
+# Retrieval: choose examples by similarity to the incoming message rather than
+# at random. Set False to go back to pure random sampling.
+RETRIEVAL = True
+SIMILAR_EXAMPLES = 15           # top matches for the message being answered
+RANDOM_EXAMPLES = 10            # random ones, so the model still sees your range
 
 
 # Who the bot is pretending to be. Override with "_persona" in contacts.json
@@ -114,27 +121,61 @@ def load_chats(path=CHATS_FILE, include_live=True):
     return chats
 
 
-def pick_examples(chats, contact):
+def _select(pairs, query, key, n_similar, n_random):
+    """
+    Retrieve by similarity, then top up with random picks.
+
+    Pure similarity would show the model one narrow topic and it starts
+    parroting. The random half keeps your general range -- length, tone,
+    the way you open and close a conversation -- in view.
+    """
+    if not pairs:
+        return [], 0
+
+    if not (RETRIEVAL and query):
+        return random.sample(pairs, min(n_similar + n_random, len(pairs))), 0
+
+    hits = retriever.get_index(key, pairs).search(query, k=n_similar)
+    chosen = [pair for pair, _score in hits]
+
+    # Top up with random picks. If retrieval found fewer than asked for -- a
+    # short message, or one with no words in common with anything -- make up
+    # the shortfall too, so the model always gets a full set of examples.
+    shortfall = n_similar - len(chosen)
+    seen = {id(p) for p in chosen}
+    rest = [p for p in pairs if id(p) not in seen]
+    if rest:
+        chosen += random.sample(rest, min(n_random + shortfall, len(rest)))
+
+    return chosen, len(hits)
+
+
+def pick_examples(chats, contact, query=""):
     """Their own history if there's enough of it, otherwise top up from everyone."""
     contacts = chats["contacts"]
     own = contacts.get(contact, {}).get("pairs", [])
 
     if len(own) >= THIN_HISTORY:
-        chosen = random.sample(own, min(EXAMPLES_PER_CONTACT, len(own)))
-        return chosen, f"{len(chosen)} from your chat with {contact}"
+        chosen, n_hits = _select(own, query, contact,
+                                 SIMILAR_EXAMPLES, RANDOM_EXAMPLES)
+        random.shuffle(chosen)
+        how = f"{n_hits} similar + {len(chosen) - n_hits} random" if n_hits else "random"
+        return chosen, f"{len(chosen)} from {contact} ({how})"
 
     pool = []
     for name, data in contacts.items():
         if name != contact:
             pool.extend(data["pairs"])
 
-    general = random.sample(pool, min(GENERAL_EXAMPLES, len(pool)))
+    general, n_hits = _select(pool, query, "__general__",
+                              SIMILAR_EXAMPLES, GENERAL_EXAMPLES - SIMILAR_EXAMPLES)
     chosen = own + general
     random.shuffle(chosen)
 
+    how = f"{n_hits} similar" if n_hits else "random"
     if own:
-        return chosen, f"{len(own)} from {contact} + {len(general)} general (thin history)"
-    return chosen, f"{len(general)} general (no history with {contact})"
+        return chosen, f"{len(own)} from {contact} + {len(general)} general ({how}, thin history)"
+    return chosen, f"{len(general)} general ({how}, no history with {contact})"
 
 
 def build_prompt(examples, contact, incoming, recent_context=None, avoid=None):
@@ -345,7 +386,7 @@ def generate_reply(contact, incoming, chats=None, recent_context=None, verbose=F
                    avoid=None):
     """Returns the reply text, or None if it should be skipped."""
     chats = chats or load_chats()
-    examples, source = pick_examples(chats, contact)
+    examples, source = pick_examples(chats, contact, query=incoming)
     prompt = build_prompt(examples, contact, incoming, recent_context, avoid)
 
     if verbose:
