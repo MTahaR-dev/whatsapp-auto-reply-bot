@@ -1,0 +1,36 @@
+{
+  "_comment": "Copy this file to contacts.json and edit it. contacts.json is gitignored.",
+
+  "_policies": {
+    "auto": "bot writes AND sends the reply on its own",
+    "draft": "bot writes the reply and shows it in the terminal, sends nothing",
+    "never": "bot stays silent, but still learns from replies you type yourself"
+  },
+
+  "_persona_help": "Who the bot writes as. Used in the prompt so the model knows whose voice it is copying. Keep 'about' short.",
+  "_persona": {
+    "name": "YourFirstName",
+    "about": "a 21-year-old university student"
+  },
+
+  "_me_help": "Your display name EXACTLY as it appears in a chat export. Open any _chat.txt from a WhatsApp export and look at the name on your own messages. It is often a nickname or symbol, not your real name.",
+  "_me": "YourNameInTheExport",
+
+  "_aliases_help": "How people tag you in groups. Include your phone number without the + sign -- WhatsApp stores mentions as @<number> internally, which is the most reliable match.",
+  "_aliases": [
+    "@YourName",
+    "@yourname",
+    "@COUNTRYCODE_AND_NUMBER_HERE"
+  ],
+
+  "_default_help": "Policy for anyone not listed below. Start with 'draft'.",
+  "_default": "draft",
+
+  "_contacts_help": "Chat names EXACTLY as they appear in WhatsApp, including emoji. Groups go here too.",
+
+  "Best Friend": "auto",
+  "Some Groupchat": "draft",
+  "Mama": "never",
+  "Papa": "never",
+  "Boss": "never"
+}

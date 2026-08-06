@@ -1,0 +1,8 @@
+# Install with:  pip install -r requirements.txt
+
+# Drives Chrome to read and send WhatsApp Web messages.
+# 4.6+ downloads chromedriver itself -- no manual driver install.
+selenium>=4.15.0
+
+# Google Gemini API client (the "brain" that writes the replies).
+google-genai>=1.0.0

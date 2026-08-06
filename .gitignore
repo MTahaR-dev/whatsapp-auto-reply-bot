@@ -1,0 +1,41 @@
+# ============================================================
+#  PRIVATE -- never commit these
+# ============================================================
+
+# Your WhatsApp session. Anyone with this folder can read your
+# messages as you. This is the single most important entry here.
+chrome_profile/
+
+# Real contact names and your phone number.
+contacts.json
+
+# Your parsed chat history and everything learned since.
+data/
+*.zip
+_chat.txt
+
+# Logs contain the text of real messages.
+logs/
+*.log
+
+
+# ============================================================
+#  Python
+# ============================================================
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+
+# ============================================================
+#  Editors / OS
+# ============================================================
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
