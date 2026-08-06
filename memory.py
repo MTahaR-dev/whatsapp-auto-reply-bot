@@ -98,6 +98,36 @@ def trusted_pairs_by_contact(store):
     return out
 
 
+REPLIED_FILE = os.path.join(HERE, "data", "replied.json")
+
+
+def load_replied():
+    """
+    {chat: last incoming message we answered}, persisted across restarts.
+
+    Kept on disk because the restart loop relaunches the bot every crash. In
+    memory only, a restart wipes it and the bot answers the same message again
+    -- which is exactly what happens in groups, where the "did they speak last"
+    rule doesn't apply.
+    """
+    if not os.path.exists(REPLIED_FILE):
+        return {}
+    try:
+        with open(REPLIED_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except (ValueError, OSError):
+        return {}
+
+
+def save_replied(replied):
+    os.makedirs(os.path.dirname(REPLIED_FILE), exist_ok=True)
+    try:
+        with open(REPLIED_FILE, "w", encoding="utf-8") as f:
+            json.dump(replied, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass
+
+
 def stats(store):
     counts = {}
     for p in store["pairs"]:

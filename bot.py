@@ -830,11 +830,13 @@ def handle_chat(driver, row, chats, rules, default, store, bot_sent, replied,
         if send_message(driver, reply):
             print(f"    SENT: {reply}")
             replied[name] = last
+            memory.save_replied(replied)
             bot_sent.add(reply.strip())     # so we don't train on our own output
         time.sleep(random.uniform(3, 7))
     else:
         why = "draft policy" if policy == "draft" else "SEND_ENABLED is False"
         replied[name] = last
+        memory.save_replied(replied)
         print(f"    DRAFT: {reply}")
         print(f"    (not sent -- {why})")
 
@@ -943,14 +945,17 @@ def main():
     print(f"GROUP_POLICY = {GROUP_POLICY}")
     print("Ctrl+C to stop.\n")
 
+    # Defined before the try: the finally block touches them, and if startup
+    # fails we'd get a NameError masking the real error.
+    backlog = set()
+    replied = memory.load_replied()      # survives restarts
+    cooldown = {"until": 0.0}
+    started_at = datetime.now()
+
     driver = build_driver()
     cycles = 0
     try:
         wait_until_loaded(driver)
-
-        backlog = set()
-        replied = {}
-        cooldown = {"until": 0.0}
         started_at = datetime.now()
 
         if IGNORE_BACKLOG_ON_START:
@@ -982,6 +987,7 @@ def main():
         print("\nStopped.")
     finally:
         memory.save(store)
+        memory.save_replied(replied)
         driver.quit()
 
 

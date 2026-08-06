@@ -382,6 +382,27 @@ def build_config(level=0):
     return types.GenerateContentConfig(**base)
 
 
+def why_empty(response):
+    """Explain an empty response. Every field here can legitimately be None."""
+    try:
+        feedback = getattr(response, "prompt_feedback", None)
+        blocked = getattr(feedback, "block_reason", None) if feedback else None
+        if blocked:
+            return f"prompt blocked ({blocked})"
+
+        candidates = getattr(response, "candidates", None)
+        if not candidates:
+            return "no candidates returned (usually a safety filter)"
+
+        first = candidates[0]
+        finish = getattr(first, "finish_reason", None)
+        if finish:
+            return f"finish_reason={finish}"
+        return "candidate had no text"
+    except Exception as e:
+        return f"unknown ({type(e).__name__})"
+
+
 def generate_reply(contact, incoming, chats=None, recent_context=None, verbose=False,
                    avoid=None):
     """Returns the reply text, or None if it should be skipped."""
@@ -433,9 +454,11 @@ def generate_reply(contact, incoming, chats=None, recent_context=None, verbose=F
     raw = (response.text or "").strip()
 
     if not raw:
+        # response.candidates can be None (not just empty), so indexing it
+        # blindly raises "'NoneType' object is not subscriptable" and hides the
+        # real problem -- which is usually a safety block or a token limit.
         if verbose:
-            finish = getattr(getattr(response, "candidates", [None])[0], "finish_reason", "?")
-            print(f"    [empty response from the model, finish_reason={finish}]")
+            print(f"    [empty response: {why_empty(response)}]")
         return None
 
     if raw.upper().startswith("SKIP"):

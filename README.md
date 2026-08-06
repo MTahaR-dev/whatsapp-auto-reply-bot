@@ -59,6 +59,8 @@ Similarity uses words **and** character 3-grams. Roman Urdu has no fixed spellin
 
 Measured against random sampling across 6 contacts, the retrieved examples are **4.8x more relevant** to the message being answered.
 
+> **Side effect worth knowing about:** retrieval concentrates whatever is semantically nearest to the query — including content that trips model-provider safety filters. Writeup: [Retrieval amplifies sensitive content](docs/retrieval-and-safety-filters.md).
+
 ---
 
 ## Why this isn't a pyautogui script
@@ -276,6 +278,7 @@ memory.py               keeps learning new pairs while it runs
 parser.py               chat export zips -> data/chats.json
 debug_selectors.py      run this when WhatsApp changes its markup
 contacts.example.json   template for your config
+docs/                   notes and writeups
 ```
 
 ---
