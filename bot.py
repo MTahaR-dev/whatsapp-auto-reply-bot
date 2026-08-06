@@ -37,7 +37,7 @@ MAX_PER_CYCLE = 5
 POLL_SECONDS = 30
 
 USE_UNREAD_FILTER = False       # False = scan all chats, decide by age instead
-HEADLESS = False                # only enable after the QR is already scanned
+HEADLESS = True                # only enable after the QR is already scanned
 
 IGNORE_BACKLOG_ON_START = False
 MAX_MESSAGE_AGE_MINUTES = 30    # with the backlog guard off, this is the main gate
@@ -109,10 +109,11 @@ def claim_single_instance(port=47281):
         _instance_lock.bind(("127.0.0.1", port))
         _instance_lock.listen(1)
     except OSError:
-        raise SystemExit(
-            "\nAnother copy of the bot is already running.\n"
-            "Run stop_bot.bat, wait a few seconds, then start again.\n"
-        )
+        print("\nAnother copy of the bot is already running.")
+        print("Run stop_bot.bat, wait a few seconds, then start again.\n")
+        # Exit code 3 is a signal to start_bot.bat: don't restart me, a bot is
+        # already up. Any other non-zero code means a crash worth retrying.
+        raise SystemExit(3)
 
 
 def chrome_options(headless):
