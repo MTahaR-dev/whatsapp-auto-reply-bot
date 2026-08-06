@@ -10,27 +10,11 @@ Built with Selenium (WhatsApp Web) and the Google Gemini API.
 
 ## Demo
 
-<!--
-  HOW TO ADD YOUR VIDEO:
 
-  Option A (easiest, plays inline on GitHub):
-    Open an issue in this repo, drag the .mp4 into the comment box, wait for
-    upload, then copy the generated user-images.githubusercontent.com URL and
-    paste it below as a bare link on its own line. GitHub renders it as a
-    player. Max 10 MB on free accounts.
 
-  Option B (YouTube):
-    [![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://youtu.be/VIDEO_ID)
+https://github.com/user-attachments/assets/183fdb9d-1d76-4ae7-b074-dc5d9fdef25e
 
-  Option C (GIF, always works, no player needed):
-    ![Demo](docs/demo.gif)
 
-  Delete this comment once the video is in.
--->
-
-> **Demo video coming soon.**
-
-<!-- PASTE VIDEO LINK BELOW THIS LINE -->
 
 
 ---
