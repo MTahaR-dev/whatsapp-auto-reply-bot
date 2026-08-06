@@ -109,7 +109,7 @@ This one targets **DOM elements**, so window position is irrelevant. It also han
 ### 2. Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/MTahaR-dev/whatsapp-auto-reply-bot.git
 cd whatsapp-auto-reply-bot
 
 python -m venv .venv
@@ -234,6 +234,7 @@ All in the CONFIG block at the top of `bot.py`:
 | `MAX_PER_CYCLE` | `5` | Chats handled per scan |
 | `HEADLESS` | `False` | Hide Chrome. Only after the QR is scanned |
 | `USE_UNREAD_FILTER` | `False` | `True` = only WhatsApp's unread list |
+| `IGNORE_BACKLOG_ON_START` | `False` | `True` = ignore what's already unread |
 
 Retrieval settings are in `brain.py`:
 
@@ -242,7 +243,6 @@ Retrieval settings are in `brain.py`:
 | `RETRIEVAL` | `True` | `False` = random example sampling |
 | `SIMILAR_EXAMPLES` | `15` | Top matches for the incoming message |
 | `RANDOM_EXAMPLES` | `10` | Random extras, so your general range stays visible |
-| `IGNORE_BACKLOG_ON_START` | `False` | `True` = ignore what's already unread |
 
 Model settings live in `brain.py` — `MODEL_PREFERENCE` picks the cheapest working model, since full Flash models allow only ~20 free requests per day.
 
